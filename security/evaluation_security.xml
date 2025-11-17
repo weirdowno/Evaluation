@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+
+		<!-- Groupes -->
+		<record id="group_evaluation_user" model="res.groups">
+			<field name="name">Evaluation - Employé évalué</field>
+			<field name="category_id" ref="base.module_category_human_resources"/>
+		</record>
+
+		<record id="group_evaluation_manager" model="res.groups">
+			<field name="name">Evaluation - Manager N+1</field>
+			<field name="category_id" ref="base.module_category_human_resources"/>
+		</record>
+
+		<record id="group_evaluation_hr" model="res.groups">
+			<field name="name">Evaluation - Ressources Humaines</field>
+			<field name="category_id" ref="base.module_category_human_resources"/>
+		</record>
+
+		<!-- Règles d’accès -->
+		<record id="rule_evaluation_employee" model="ir.rule">
+			<field name="name">Evaluation: accès employé (ses fiches validées)</field>
+			<field name="model_id" ref="model_evaluation_rendement"/>
+			<field name="domain_force">[("employe_id.user_id","=", user.id), ("state","=","done")]</field>
+			<field name="perm_read" eval="True"/>
+			<field name="perm_write" eval="False"/>
+			<field name="perm_create" eval="False"/>
+			<field name="perm_unlink" eval="False"/>
+			<field name="groups" eval="[(4, ref('group_evaluation_user'))]"/>
+		</record>
+
+		<!-- Managers: lecture sur tout l'arbre de subordination; écriture uniquement sur les N-1 -->
+		<record id="rule_evaluation_manager_read" model="ir.rule">
+			<field name="name">Evaluation: accès manager lecture subordonnés</field>
+			<field name="model_id" ref="model_evaluation_rendement"/>
+			<field name="domain_force">[("employe_id","child_of", user.employee_id.id)]</field>
+			<field name="perm_read" eval="True"/>
+			<field name="perm_write" eval="False"/>
+			<field name="perm_create" eval="False"/>
+			<field name="perm_unlink" eval="False"/>
+			<field name="groups" eval="[(4, ref('group_evaluation_manager'))]"/>
+		</record>
+
+		<record id="rule_evaluation_manager_write" model="ir.rule">
+			<field name="name">Evaluation: accès manager écriture N-1</field>
+			<field name="model_id" ref="model_evaluation_rendement"/>
+			<field name="domain_force">[("employe_id.parent_id.user_id","=", user.id)]</field>
+			<field name="perm_read" eval="True"/>
+			<field name="perm_write" eval="True"/>
+			<field name="perm_create" eval="True"/>
+			<field name="perm_unlink" eval="False"/>
+			<field name="groups" eval="[(4, ref('group_evaluation_manager'))]"/>
+		</record>
+
+		<!-- RH: plein accès -->
+		<record id="rule_evaluation_hr" model="ir.rule">
+			<field name="name">Evaluation: accès RH</field>
+			<field name="model_id" ref="model_evaluation_rendement"/>
+			<field name="domain_force">[(1, '=', 1)]</field>
+			<field name="perm_read" eval="True"/>
+			<field name="perm_write" eval="True"/>
+			<field name="perm_create" eval="True"/>
+			<field name="perm_unlink" eval="True"/>
+			<field name="groups" eval="[(4, ref('group_evaluation_hr'))]"/>
+		</record>
+
+	</data>
+</odoo>

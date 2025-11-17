@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree -->
+    <record id="view_evaluation_rendement_tree" model="ir.ui.view">
+        <field name="name">evaluation.rendement.tree</field>
+        <field name="model">evaluation.rendement</field>
+        <field name="arch" type="xml">
+            <tree string="Évaluations de rendement" class="evaluation_tree">
+               <!-- <field name="name"/>-->
+                <field name="employe_id"/>
+                <field name="semester"/>
+                <field name="year"/>
+                <field name="score_total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_evaluation_rendement_search" model="ir.ui.view">
+        <field name="name">evaluation.rendement.search</field>
+        <field name="model">evaluation.rendement</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher évaluations">
+                <field name="employe_id"/>
+                <filter name="semester_s1" string="S1" domain="[('semester','=','S1')]"/>
+                <filter name="semester_s2" string="S2" domain="[('semester','=','S2')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter name="group_semester" string="Saison" context="{'group_by':'semester'}"/>
+                    <filter name="group_year" string="Année" context="{'group_by':'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="view_evaluation_rendement_form" model="ir.ui.view">
+        <field name="name">evaluation.rendement.form</field>
+        <field name="model">evaluation.rendement</field>
+        <field name="arch" type="xml">
+            <form string="Évaluation du rendement">
+                <header>
+                    <button name="action_send_for_validation" type="object" string="validation initial"
+                            class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_validate" type="object" string="Valider" class="btn-primary"
+                            attrs="{'invisible': ['|', ('state', '!=', 'to_validate_n1'), ('can_validate','=', True)]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_validate_n1,done"/>
+                </header>
+
+                <sheet class="evaluation_form">
+                    <!-- champs invisibles nécessaires pour les attrs -->
+                    <field name="can_validate" invisible="1"/>
+                    <field name="can_edit_manager_comment" invisible="1"/>
+
+                    <group>
+                       <!-- <field name="name"/>-->
+                        <field name="employe_id" domain="[('parent_id.user_id','=', uid)]"/>
+                        <field name="semester"/>
+                        <field name="year"/>
+                        <field name="validateur_n1_id" readonly="1"/>
+                        <field name="date_saisie" readonly="1"/>
+                        <field name="date_validation" readonly="1"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Critères collectifs">
+                            <group>
+                                <field name="score_disponibilite" />
+                                <field name="score_accident_travail" />
+                                <field name="score_accident_materiel" />
+                            </group>
+                        </page>
+
+                        <page string="Critères individuels">
+                            <group>
+                                <field name="score_temps_execution"/>
+                                <field name="score_respect_procedures"/>
+                                <field name="score_absenteisme"/>
+                                <field name="score_discipline"/>
+                            </group>
+                        </page>
+
+                        <page string="Commentaires &amp; validation">
+                            <group>
+                                <field name="commentaire_employe" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            </group>
+                            <group>
+                                <field name="commentaire_manager"
+                                       attrs="{'readonly': [('can_edit_manager_comment','=', False)], 'invisible': [('state','=','draft')]}"/>
+                            </group>
+                            <group>
+                                <field name="score_total" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action & menu -->
+    <record id="action_evaluation_rendement" model="ir.actions.act_window">
+        <field name="name">Évaluations</field>
+        <field name="res_model">evaluation.rendement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_evaluation_rendement_search"/>
+    </record>
+
+    <menuitem id="menu_evaluation_root" name="Évaluations" sequence="20"/>
+    <menuitem id="menu_evaluation_rendement" name="Évaluations rendement"
+              parent="menu_evaluation_root" action="action_evaluation_rendement"/>
+</odoo>
