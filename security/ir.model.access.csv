@@ -2,3 +2,11 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_evaluation_rendement_user,evaluation.rendement.user,model_evaluation_rendement,group_evaluation_user,1,0,0,0
 access_evaluation_rendement_manager,evaluation.rendement.manager,model_evaluation_rendement,group_evaluation_manager,1,1,1,0
 access_evaluation_rendement_hr,evaluation.rendement.hr,model_evaluation_rendement,group_evaluation_hr,1,1,1,1
+access_evaluation_saison_hr,evaluation.saison.hr,model_evaluation_saison,group_evaluation_hr,1,1,1,1
+access_evaluation_critere_hr,evaluation.critere.hr,model_evaluation_critere,group_evaluation_hr,1,1,1,1
+access_evaluation_ligne_user,evaluation.ligne.user,model_evaluation_rendement_ligne,group_evaluation_user,1,0,0,0
+access_evaluation_ligne_manager,evaluation.ligne.manager,model_evaluation_rendement_ligne,group_evaluation_manager,1,1,0,0
+access_evaluation_ligne_hr,evaluation.ligne.hr,model_evaluation_rendement_ligne,group_evaluation_hr,1,1,1,1
+access_evaluation_saison_manager,evaluation.saison.manager,model_evaluation_saison,group_evaluation_manager,1,0,0,0
+access_evaluation_ligne_manager,evaluation.ligne.manager,model_evaluation_rendement_ligne,group_evaluation_manager,1,1,1,1
+access_evaluation_critere_manager,evaluation.critere.manager,model_evaluation_critere,group_evaluation_manager,1,0,0,0

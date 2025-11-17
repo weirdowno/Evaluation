@@ -1,50 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Tree -->
+    <!-- Tree View pour evaluation.rendement -->
     <record id="view_evaluation_rendement_tree" model="ir.ui.view">
         <field name="name">evaluation.rendement.tree</field>
         <field name="model">evaluation.rendement</field>
         <field name="arch" type="xml">
             <tree string="Évaluations de rendement" class="evaluation_tree">
-               <!-- <field name="name"/>-->
                 <field name="employe_id"/>
-                <field name="semester"/>
-                <field name="year"/>
+                <field name="saison_id"/>
                 <field name="score_total"/>
                 <field name="state"/>
             </tree>
         </field>
     </record>
 
-    <!-- Search -->
+    <!-- Search View pour evaluation.rendement -->
     <record id="view_evaluation_rendement_search" model="ir.ui.view">
         <field name="name">evaluation.rendement.search</field>
         <field name="model">evaluation.rendement</field>
         <field name="arch" type="xml">
             <search string="Rechercher évaluations">
                 <field name="employe_id"/>
-                <filter name="semester_s1" string="S1" domain="[('semester','=','S1')]"/>
-                <filter name="semester_s2" string="S2" domain="[('semester','=','S2')]"/>
-                <separator/>
-                <group expand="0" string="Grouper par">
-                    <filter name="group_semester" string="Saison" context="{'group_by':'semester'}"/>
-                    <filter name="group_year" string="Année" context="{'group_by':'year'}"/>
-                </group>
+                <field name="saison_id"/>
+                <filter name="draft" string="Brouillons" domain="[('state','=','draft')]"/>
+                <filter name="to_validate" string="À valider" domain="[('state','=','to_validate_n1')]"/>
+                <filter name="done" string="Validées" domain="[('state','=','done')]"/>
             </search>
         </field>
     </record>
 
-    <!-- Form -->
+    <!-- Form View pour evaluation.rendement -->
     <record id="view_evaluation_rendement_form" model="ir.ui.view">
         <field name="name">evaluation.rendement.form</field>
         <field name="model">evaluation.rendement</field>
         <field name="arch" type="xml">
             <form string="Évaluation du rendement">
                 <header>
+                    <button name="action_charger_criteres" type="object" string="CHARGER LES CRITÈRES" class="btn-primary"/>
                     <button name="action_send_for_validation" type="object" string="validation initial"
                             class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="action_validate" type="object" string="Valider" class="btn-primary"
-                            attrs="{'invisible': ['|', ('state', '!=', 'to_validate_n1'), ('can_validate','=', True)]}"/>
+                            attrs="{'invisible': [('state', '!=', 'to_validate_n1')]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_validate_n1,done"/>
                 </header>
 
@@ -54,52 +50,54 @@
                     <field name="can_edit_manager_comment" invisible="1"/>
 
                     <group>
-                       <!-- <field name="name"/>-->
-                        <field name="employe_id" domain="[('parent_id.user_id','=', uid)]"/>
-                        <field name="semester"/>
-                        <field name="year"/>
-                        <field name="validateur_n1_id" readonly="1"/>
-                        <field name="date_saisie" readonly="1"/>
-                        <field name="date_validation" readonly="1"/>
+                        <group>
+                            <field name="employe_id" domain="[('parent_id.user_id','=', uid)]"/>
+                            <field name="saison_id" required="1"/>
+                            
+                        </group>
+                        <group>
+                            <field name="validateur_n1_id" readonly="1"/>
+                            <field name="date_saisie" readonly="1"/>
+                            <field name="date_validation" readonly="1"/>
+                        </group>
                     </group>
 
-                    <notebook>
-                        <page string="Critères collectifs">
-                            <group>
-                                <field name="score_disponibilite" />
-                                <field name="score_accident_travail" />
-                                <field name="score_accident_materiel" />
-                            </group>
-                        </page>
-
-                        <page string="Critères individuels">
-                            <group>
-                                <field name="score_temps_execution"/>
-                                <field name="score_respect_procedures"/>
-                                <field name="score_absenteisme"/>
-                                <field name="score_discipline"/>
-                            </group>
-                        </page>
-
-                        <page string="Commentaires &amp; validation">
-                            <group>
-                                <field name="commentaire_employe" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            </group>
-                            <group>
-                                <field name="commentaire_manager"
-                                       attrs="{'readonly': [('can_edit_manager_comment','=', False)], 'invisible': [('state','=','draft')]}"/>
-                            </group>
-                            <group>
-                                <field name="score_total" readonly="1"/>
-                            </group>
-                        </page>
-                    </notebook>
+     <notebook>
+    <page string="Scores par critères">
+        
+            <div class="o_form_label" style="margin-bottom: 16px;">
+                <strong>Tous les critères de la saison sélectionnée</strong>
+                <br/>
+                <small>Modifiez seulement les scores dans le tableau ci-dessous</small>
+            </div>
+            <field name="ligne_critere_ids" context="{'default_evaluation_id': id}">
+                <tree editable="bottom"  string=" ">
+                    <field name="critere_id" readonly="1" string="Critère" style="width: 50%;"/>
+                    <field name="type_critere" readonly="1" string="Type" style="width: 15%;"/>
+                    <field name="score" required="1" string="Score"    style="width: 15%;"/>
+                    <field name="commentaire" string="Commentaire" style="width: 20%;"/>
+                    <field name="score_max" readonly="1" string="Score Maximum"/>
+                </tree>
+                <form>
+                    <group>
+                        <field name="critere_id" readonly="1"/>
+                        <field name="type_critere" readonly="1"/>
+                        <field name="score" required="1"/>
+                        <field name="score_max" readonly="1" string="Score Maximum"/>
+                        <field name="commentaire"/>
+                    </group>
+                </form>
+            </field>
+        
+    </page>
+    
+</notebook>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- Action & menu -->
+    <!-- Action & menu PRINCIPAL -->
     <record id="action_evaluation_rendement" model="ir.actions.act_window">
         <field name="name">Évaluations</field>
         <field name="res_model">evaluation.rendement</field>
@@ -110,4 +108,151 @@
     <menuitem id="menu_evaluation_root" name="Évaluations" sequence="20"/>
     <menuitem id="menu_evaluation_rendement" name="Évaluations rendement"
               parent="menu_evaluation_root" action="action_evaluation_rendement"/>
+
+    <!-- Vues pour Saison -->
+    <record id="view_saison_tree" model="ir.ui.view">
+        <field name="name">evaluation.saison.tree</field>
+        <field name="model">evaluation.saison</field>
+        <field name="arch" type="xml">
+            <tree string="Saisons d'évaluation">
+                <field name="name"/>
+                <field name="semester"/>
+                <field name="year"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_saison_form" model="ir.ui.view">
+        <field name="name">evaluation.saison.form</field>
+        <field name="model">evaluation.saison</field>
+        <field name="arch" type="xml">
+            <form string="Saison d'évaluation">
+                <header>
+                    <button name="action_copy_criteres_from_previous" type="object" 
+                            string="Copier les critères de la saison précédente" 
+                            class="btn-secondary"
+                            attrs="{'invisible': [('id', '=', False)]}"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="semester"/>
+                            <field name="year"/>
+                        </group>
+                        <group>
+                            <field name="date_debut"/>
+                            <field name="date_fin"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Section pour assigner les critères -->
+                    <group string="Critères d'évaluation">
+                        <field name="critere_ids" widget="many2many_tags" 
+                               domain="[('actif', '=', True)]"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_saison_search" model="ir.ui.view">
+        <field name="name">evaluation.saison.search</field>
+        <field name="model">evaluation.saison</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher saisons">
+                <field name="name"/>
+                <field name="year"/>
+                <filter name="active" string="Actives" domain="[('active','=',True)]"/>
+                <filter name="semester_s1" string="S1" domain="[('semester','=','S1')]"/>
+                <filter name="semester_s2" string="S2" domain="[('semester','=','S2')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vues pour Critere -->
+    <record id="view_critere_tree" model="ir.ui.view">
+        <field name="name">evaluation.critere.tree</field>
+        <field name="model">evaluation.critere</field>
+        <field name="arch" type="xml">
+            <tree string="Critères d'évaluation">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type_critere"/>
+                <field name="poids"/>
+                <field name="actif"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_critere_form" model="ir.ui.view">
+        <field name="name">evaluation.critere.form</field>
+        <field name="model">evaluation.critere</field>
+        <field name="arch" type="xml">
+            <form string="Critère d'évaluation">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="type_critere"/>
+                        </group>
+                        <group>
+                             
+                            <field name="score_min"/>
+                            <field name="score_max"/>
+   
+
+                            <field name="sequence"/>
+                            <field name="poids"/>
+                            <field name="actif"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Description détaillée du critère..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_critere_search" model="ir.ui.view">
+        <field name="name">evaluation.critere.search</field>
+        <field name="model">evaluation.critere</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher critères">
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="type_collectif" string="Collectifs" domain="[('type_critere','=','collectif')]"/>
+                <filter name="type_individuel" string="Individuels" domain="[('type_critere','=','individuel')]"/>
+                <filter name="actifs" string="Actifs" domain="[('actif','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions et menus pour Saison et Critere -->
+    <record id="action_saison" model="ir.actions.act_window">
+        <field name="name">Saisons d'évaluation</field>
+        <field name="res_model">evaluation.saison</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_saison_search"/>
+    </record>
+
+    <record id="action_critere" model="ir.actions.act_window">
+        <field name="name">Critères d'évaluation</field>
+        <field name="res_model">evaluation.critere</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_critere_search"/>
+    </record>
+
+    <!-- Menus pour Saison et Critere -->
+    <menuitem id="menu_saison" name="Saisons" parent="menu_evaluation_root" 
+              action="action_saison" sequence="10"/>
+    <menuitem id="menu_critere" name="Critères" parent="menu_evaluation_root" 
+              action="action_critere" sequence="20"/>
 </odoo>

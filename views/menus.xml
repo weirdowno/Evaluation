@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menu principal -->
+    <menuitem id="menu_evaluation_root"
+              name="Évaluations"
+              parent="hr.menu_hr_root"
+              sequence="10"/>
+
+    <!-- ✅ ✅ Action manquante : créer ici -->
+    <record id="action_evaluation_saison" model="ir.actions.act_window">
+        <field name="name">Saisons d'évaluation</field>
+        <field name="res_model">evaluation.saison</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu pour accéder aux saisons (maintenant l’action existe) -->
+    <menuitem id="menu_evaluation_saisons"
+              name="Saisons"
+              parent="menu_evaluation_root"
+              action="action_evaluation_saison"
+              sequence="10"/>
+
+</odoo>
