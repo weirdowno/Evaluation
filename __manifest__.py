@@ -5,10 +5,10 @@
     'summary': 'Module d évaluation du rendement',
     'depends': ['base', 'hr'],
     'data': [
-       
         'security/evaluation_security.xml',  
-         'security/ir.model.access.csv',  # Load this FIRST
-        'views/evaluation_views.xml',  # Then views
+        'security/ir.model.access.csv',
+        'data/critere_data.xml',  # Nouveau fichier de données
+        'views/evaluation_views.xml',
     ],
     'installable': True,
     'application': True,

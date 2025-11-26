@@ -337,13 +337,31 @@ class EvaluationRendementLigne(models.Model):
     )
     score = fields.Float(string="Score", default=0.0)
     commentaire = fields.Text(string="Commentaire")
+    date_derniere_modification_score = fields.Datetime(
+        string="Date dernière modification score",
+        readonly=True,
+        help="Date et heure de la dernière modification du score"
+    )
     score_max = fields.Float(
         string="Score max",
         related="critere_id.score_max",
         store=True,
         readonly=True
     )
+   
+    @api.model
+    def create(self, vals):
+        """Initialiser la date de modification si un score est fourni à la création"""
+        if 'score' in vals and vals.get('score', 0.0) != 0.0:
+            vals['date_derniere_modification_score'] = fields.Datetime.now()
+        return super().create(vals)
 
+    def write(self, vals):
+        """Mettre à jour la date de modification si le score change"""
+        if 'score' in vals:
+            vals['date_derniere_modification_score'] = fields.Datetime.now()
+        return super().write(vals)
+    
     @api.constrains('score')
     def _check_score_range(self):
         for record in self:
@@ -366,17 +384,4 @@ class EvaluationRendementLigne(models.Model):
         )
     ]
 
-    @api.constrains('score')
-    def _check_score_range(self):
-      for record in self:
-        if record.critere_id and record.score is not False:
-            min_score = record.critere_id.score_min
-            max_score = record.critere_id.score_max
-            
-            if record.score < min_score or record.score > max_score:
-                raise ValidationError(
-                    f"Le score pour le critère '{record.critere_id.name}' "
-                    f"doit être entre {min_score} et {max_score}. "
-                    f"Score saisi: {record.score}"
-                )
     

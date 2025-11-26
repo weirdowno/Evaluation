@@ -60,6 +60,10 @@
                             <field name="date_saisie" readonly="1"/>
                             <field name="date_validation" readonly="1"/>
                         </group>
+
+                    <group>
+                    <field name="score_total"/>
+                    </group>
                     </group>
 
      <notebook>
@@ -77,6 +81,7 @@
                     <field name="score" required="1" string="Score"    style="width: 15%;"/>
                     <field name="commentaire" string="Commentaire" style="width: 20%;"/>
                     <field name="score_max" readonly="1" string="Score Maximum"/>
+                    <field name="date_derniere_modification_score" readonly="1" string="Dernière modif. score"/>
                 </tree>
                 <form>
                     <group>
@@ -84,6 +89,7 @@
                         <field name="type_critere" readonly="1"/>
                         <field name="score" required="1"/>
                         <field name="score_max" readonly="1" string="Score Maximum"/>
+                        <field name="date_derniere_modification_score" readonly="1" string="Date dernière modification score"/>
                         <field name="commentaire"/>
                     </group>
                 </form>
